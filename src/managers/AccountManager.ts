@@ -4,7 +4,7 @@ import { RequestHandler } from 'express'
 
 import User from "@/db/models/User"
 import { validateEmail, validatePassword, isEmailAvailable } from "@/utils/validator"
-import { DAY } from '@/utils/constants'
+import { HOUR } from '@/utils/constants'
 import { IUserSchema } from '@/types/schemas'
 
 const JWT_SECRET = process.env.JWT_SECRET as string
@@ -54,9 +54,9 @@ export const sendToken: RequestHandler = async (req, res) => {
   const user = req.user
   if(!user)
       return res.status(401)
-  const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: 7*DAY })
+  const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: HOUR })
 
-  return res.status(200).json({token, id: user._id})
+  return res.status(200).json({token, id: user._id, exires_in: HOUR})
 }
 
 export default {

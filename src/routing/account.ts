@@ -40,14 +40,14 @@ router.post('/check-email', handleMissingBody(['email']), async (req, res) => {
 
   const available = await isEmailAvailable(email)
 
-  res.status(200).json({ok: "true", available: available})
+  res.status(200).json({available})
 
 })
 
 router.post('/login', passport.authenticate('local', {session: false}), AccountManager.sendToken)
 
-router.get('/auth', jwtAuth, (req, res) => {
-  res.status(200).json({ok: "true", id: req.user!._id})
+router.get('/id', jwtAuth, (req, res) => {
+  res.status(200).json({id: req.user!._id})
 })
 
 export default router

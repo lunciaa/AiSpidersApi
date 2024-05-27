@@ -10,9 +10,13 @@ import pc from 'picocolors'
 dotenv.config()
 
 import router from '@/routing/router'
+import db_connect from './db/connect';
+import passport from '@/auth/passport'
 
 var key: string
 var cert: string
+
+const PORT = process.env.PORT || 5000;
 
 console.log(pc.bold("App is starting!"))
 
@@ -30,15 +34,28 @@ try {
   process.exit(1)
 }
 
-
-const PORT = process.env.PORT || 5000;
+(async () => {
+  const db = await db_connect()
+})()
 
 
 const app = express()
 
-// Middlewares
+
+// Settings
+app.disable("x-powered-by")
+
+// Body parser
+app.use(express.json())
+
+// Logging
 app.use(morgan("dev"))
-app.use(router)
+
+// Auth
+passport()
+
+// Routing
+app.use('/api/v1', router)
 
 const server = https.createServer({key, cert}, app)
 server.listen(PORT, () => {

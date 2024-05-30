@@ -1,23 +1,19 @@
 import { RequestHandler } from "express"
 
-const handleMissingBody = (body: string[]) => {
+export default (query: string[]) => {
   const middleware: RequestHandler = (req, res, next) => {
 
     let i = 0
 
-    body.forEach(param => {
-      if(req.body[param])
+    query.forEach(param => {
+      if(req.query[param])
         i++
     })
 
-    if (i === body.length)
+    if (i === query.length)
       next()
     else res.status(400).json({ok: false, msg: "Invalid request data"})
   }
 
   return middleware
 }
-
-export const handleMissingCredentials = handleMissingBody(['email', 'password'])
-
-export default handleMissingBody

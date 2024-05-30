@@ -1,13 +1,8 @@
 import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
-import { RequestHandler } from 'express'
 
 import User from "@/db/models/User"
 import { validateEmail, validatePassword, isEmailAvailable } from "@/utils/validator"
-import { HOUR } from '@/utils/constants'
 import { IUserSchema } from '@/types/schemas'
-
-const JWT_SECRET = process.env.JWT_SECRET as string
 
 export type account_validate_error = {
   field: "email" | "password",
@@ -19,12 +14,12 @@ export const register = async (email: string, password: string) => {
   let isServerError = false
 
   if(!validatePassword(password))
-    errors.push({field: 'password', msg: 'invalid_password'})
+    errors.push({field: 'password', msg: 'errors_form_invalid_password'})
 
   if(!validateEmail(email))
-    errors.push({field: 'email', msg: 'invalid_email'})
+    errors.push({field: 'email', msg: 'errors_form_invalid_email'})
   else if(!await isEmailAvailable(email))
-    errors.push({field: 'email', msg: 'email_taken'})
+    errors.push({field: 'email', msg: 'errors_form_email_taken'})
 
   let user: IUserSchema | null = null
 
@@ -49,16 +44,6 @@ export const register = async (email: string, password: string) => {
   }
 }
 
-export const sendToken: RequestHandler = async (req, res) => {
-
-  const user = req.user
-  if(!user)
-      return res.status(401)
-  const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: HOUR })
-
-  return res.status(200).json({token, id: user._id, exires_in: HOUR})
-}
-
 export default {
-  register, sendToken
+  register
 }

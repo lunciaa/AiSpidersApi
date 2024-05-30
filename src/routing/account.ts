@@ -1,15 +1,21 @@
 import { Router } from 'express'
-import passport from 'passport'
 
-import handleMissingBody from '@/middlewares/handleMissingBody'
+import handleMissingBody, { handleMissingCredentials } from '@/middlewares/handleMissingBody'
 import { validateEmail, isEmailAvailable } from '@/utils/validator'
 import AccountManager, { account_validate_error } from '@/managers/AccountManager'
-import jwtAuth from '@/middlewares/jwtAuth'
+import signIn from '@/auth/signIn'
+import responseWithToken from '@/auth/responseWithToken'
+import authenticate from '@/auth/authenticate'
 
 
 const router = Router()
 
-router.post('/register', handleMissingBody(["email", "password"]), async (req, res, next) => {
+router.get('/', authenticate, (req, res) => {
+  const user = req.user!
+  res.status(200).json({id: user.id, displayName: user.display_name || null})
+})
+
+router.post('/register', handleMissingCredentials, async (req, res, next) => {
   const { email, password } = req.body
 
   const { errors, isServerError, user } = await AccountManager.register(email, password)
@@ -24,7 +30,7 @@ router.post('/register', handleMissingBody(["email", "password"]), async (req, r
     res.status(400).json({ok: "false", errors})
   }
 
-}, AccountManager.sendToken)
+}, responseWithToken)
 
 router.post('/check-email', handleMissingBody(['email']), async (req, res) => {
   const { email } = req.body
@@ -44,10 +50,6 @@ router.post('/check-email', handleMissingBody(['email']), async (req, res) => {
 
 })
 
-router.post('/login', passport.authenticate('local', {session: false}), AccountManager.sendToken)
-
-router.get('/id', jwtAuth, (req, res) => {
-  res.status(200).json({id: req.user!._id})
-})
+router.post('/login', handleMissingCredentials, signIn, responseWithToken)
 
 export default router

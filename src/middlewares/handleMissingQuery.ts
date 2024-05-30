@@ -1,3 +1,4 @@
+import errors from "@/utils/errors"
 import { RequestHandler } from "express"
 
 export default (query: string[]) => {
@@ -12,7 +13,7 @@ export default (query: string[]) => {
 
     if (i === query.length)
       next()
-    else res.status(400).json({ok: false, msg: "Invalid request data"})
+    else res.status(400).json({ok: false, msg: errors.invalid_request})
   }
 
   return middleware

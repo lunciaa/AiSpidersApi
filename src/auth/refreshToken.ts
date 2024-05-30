@@ -1,5 +1,6 @@
 import { jwt_payload } from "@/types/auth"
 import { HOUR } from "@/utils/constants"
+import errors from "@/utils/errors"
 import { RequestHandler } from "express"
 import jwt from 'jsonwebtoken'
 
@@ -9,7 +10,7 @@ const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET
 export const refreshToken: RequestHandler = async (req, res) => {
   const refreshToken = req.cookies.refreshToken
   if(!refreshToken) {
-    return res.status(401).json({msg: "Access denied. No refresh token provided."})
+    return res.status(401).json({msg: errors.no_refresh_token})
   }
 
   try {
@@ -19,6 +20,6 @@ export const refreshToken: RequestHandler = async (req, res) => {
     res.cookie('token', accessToken, { httpOnly: true, secure: true })
     res.status(200).json({ok: true})
   } catch(err) {
-
+    res.status(401).json({msg: errors.invalid_refresh_token})
   }
 }

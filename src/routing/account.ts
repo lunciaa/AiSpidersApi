@@ -7,6 +7,8 @@ import signIn from '@/auth/signIn'
 import responseWithToken from '@/auth/responseWithToken'
 import authenticate from '@/auth/authenticate'
 
+import _errors from '@/utils/errors'
+
 
 const router = Router()
 
@@ -38,7 +40,7 @@ router.post('/check-email', handleMissingBody(['email']), async (req, res) => {
   const errors: account_validate_error[] = []
 
   if(!validateEmail(email))
-      errors.push({field: "email", msg: "invalid_email"})
+      errors.push({field: "email", msg: _errors.invalid_email})
 
   if(errors.length !== 0) {
     return res.status(400).json({ok: "false", errors: errors})

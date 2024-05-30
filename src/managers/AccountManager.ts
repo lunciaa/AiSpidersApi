@@ -4,6 +4,8 @@ import User from "@/db/models/User"
 import { validateEmail, validatePassword, isEmailAvailable } from "@/utils/validator"
 import { IUserSchema } from '@/types/schemas'
 
+import _errors from '@/utils/errors'
+
 export type account_validate_error = {
   field: "email" | "password",
   msg: string
@@ -14,12 +16,12 @@ export const register = async (email: string, password: string) => {
   let isServerError = false
 
   if(!validatePassword(password))
-    errors.push({field: 'password', msg: 'errors_form_invalid_password'})
+    errors.push({field: 'password', msg: _errors.invalid_password})
 
   if(!validateEmail(email))
-    errors.push({field: 'email', msg: 'errors_form_invalid_email'})
+    errors.push({field: 'email', msg: _errors.invalid_email})
   else if(!await isEmailAvailable(email))
-    errors.push({field: 'email', msg: 'errors_form_email_taken'})
+    errors.push({field: 'email', msg: _errors.email_taken})
 
   let user: IUserSchema | null = null
 
